@@ -1,10 +1,537 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-   <style>
-      body {background: #222222;}
-   </style>
-   <strong style="font-family:Courier; color:#00FF00; font-size: 20px;";>sudo date -s "$(wget -qSO- --max-redirect=0 1.1.1.1 2>&1 | grep Date: | cut -d' ' -f5-8)Z";</strong>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Countdown Timer</title>
+  <style>
+    :root{
+      --bg: #ffffff;
+      --fg: #111827;
+      --muted:#6b7280;
+      --panel:#f3f4f6;
+      --btn:#111827;
+      --btnfg:#ffffff;
+      --btn2:#e5e7eb;
+      --btn2fg:#111827;
+      --border:#e5e7eb;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    [data-theme="dark"]{
+      --bg: #0b0f1a;
+      --fg: #f9fafb;
+      --muted:#9ca3af;
+      --panel:#111827;
+      --btn:#f9fafb;
+      --btnfg:#0b0f1a;
+      --btn2:#1f2937;
+      --btn2fg:#f9fafb;
+      --border:#1f2937;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:var(--bg);
+      color:var(--fg);
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .timer-card{
+      width:min(900px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+    }
+
+    .topbar{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      color:var(--muted);
+      font-size:14px;
+      user-select:none;
+    }
+
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:transparent;
+    }
+
+    .switch{
+      width:40px; height:22px;
+      border-radius:999px;
+      background:var(--btn2);
+      position:relative;
+      border:1px solid var(--border);
+      cursor:pointer;
+    }
+    .switch::after{
+      content:"";
+      width:18px; height:18px;
+      border-radius:50%;
+      background:var(--bg);
+      position:absolute;
+      top:1px; left:1px;
+      transition: transform .18s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    [data-theme="dark"] .switch::after{ background:#0b0f1a; }
+    .switch[aria-checked="true"]::after{ transform: translateX(18px); }
+
+    .linkbtn{
+      border:1px solid var(--border);
+      background:transparent;
+      color:var(--muted);
+      padding:8px 12px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+    .linkbtn:hover{ filter:brightness(0.98); }
+
+    .display{
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      gap:18px;
+      padding:18px 18px 10px;
+    }
+
+    .unit{
+      text-align:center;
+      min-width:160px;
+    }
+    .digits{
+      font-size:92px;
+      font-weight:700;
+      letter-spacing:1px;
+      line-height:1;
+      font-variant-numeric: tabular-nums;
+    }
+    .label{
+      margin-top:10px;
+      font-size:18px;
+      color:var(--muted);
+    }
+    .colon{
+      font-size:82px;
+      font-weight:600;
+      line-height:1;
+      padding:0 2px 12px;
+      color:var(--muted);
+      user-select:none;
+    }
+
+    .buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      justify-content:center;
+    }
+    button.action{
+      border:none;
+      border-radius:12px;
+      padding:12px 18px;
+      font-size:16px;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+    .primary{ background:var(--btn); color:var(--btnfg); }
+    .secondary{ background:var(--btn2); color:var(--btn2fg); border:1px solid var(--border); box-shadow:none; }
+    .action:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
+
+    .settings{
+      width:min(720px,100%);
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow: var(--shadow);
+      display:none;
+    }
+    .settings.open{ display:block; }
+
+    .row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:180px;
+    }
+    .field label{
+      font-size:13px;
+      color:var(--muted);
+    }
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:var(--bg);
+      color:var(--fg);
+      font-size:15px;
+      outline:none;
+    }
+
+    .hint{
+      margin-top:12px;
+      text-align:center;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    @media (max-width: 720px){
+      .unit{ min-width:120px; }
+      .digits{ font-size:64px; }
+      .colon{ font-size:56px; padding-bottom:10px; }
+      .label{ font-size:14px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <div class="timer-card" role="application" aria-label="Countdown timer">
+
+      <div class="topbar">
+        <div class="toggle" title="Toggle dark mode">
+          <span>Dark mode</span>
+          <div id="darkSwitch" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+        </div>
+
+        <button id="fsBtn" class="linkbtn" type="button">Fullscreen</button>
+      </div>
+
+      <div class="display" aria-live="polite" aria-atomic="true">
+        <div class="unit">
+          <div id="hh" class="digits">00</div>
+          <div class="label">Hours</div>
+        </div>
+        <div class="colon">:</div>
+        <div class="unit">
+          <div id="mm" class="digits">00</div>
+          <div class="label">Minutes</div>
+        </div>
+        <div class="colon">:</div>
+        <div class="unit">
+          <div id="ss" class="digits">00</div>
+          <div class="label">Seconds</div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="startBtn" class="action primary" type="button">Start</button>
+        <button id="pauseBtn" class="action secondary" type="button" disabled>Pause</button>
+        <button id="resetBtn" class="action secondary" type="button" disabled>Reset</button>
+        <button id="settingsBtn" class="action secondary" type="button">Settings</button>
+      </div>
+
+      <div id="settings" class="settings" aria-label="Timer settings">
+        <div class="row">
+          <div class="field">
+            <label for="hoursSel">Hours</label>
+            <select id="hoursSel"></select>
+          </div>
+          <div class="field">
+            <label for="minsSel">Minutes</label>
+            <select id="minsSel"></select>
+          </div>
+          <div class="field">
+            <label for="secsSel">Seconds</label>
+            <select id="secsSel"></select>
+          </div>
+        </div>
+        <div class="hint" id="msg">Please select a Timer period</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ---------- helpers ----------
+    const pad2 = (n) => String(n).padStart(2, "0");
+
+    function fillSelect(sel, max, { twoDigit = true } = {}) {
+      sel.innerHTML = "";
+      for (let i = 0; i <= max; i++) {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = twoDigit ? pad2(i) : String(i);
+        sel.appendChild(opt);
+      }
+    }
+
+    // ---------- elements ----------
+    const hhEl = document.getElementById("hh");
+    const mmEl = document.getElementById("mm");
+    const ssEl = document.getElementById("ss");
+
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsPanel = document.getElementById("settings");
+    const msgEl = document.getElementById("msg");
+
+    const hoursSel = document.getElementById("hoursSel");
+    const minsSel = document.getElementById("minsSel");
+    const secsSel = document.getElementById("secsSel");
+
+    const fsBtn = document.getElementById("fsBtn");
+    const darkSwitch = document.getElementById("darkSwitch");
+
+    // ---------- populate selectors ----------
+    fillSelect(hoursSel, 168, { twoDigit: true });  // matches the site offering up to 168 hours
+    fillSelect(minsSel, 59, { twoDigit: true });
+    fillSelect(secsSel, 59, { twoDigit: true });
+
+    // ---------- state ----------
+    let initialMs = 0;
+    let remainingMs = 0;
+    let running = false;
+
+    let rafId = null;
+    let lastTick = 0;
+
+    // ---------- persistence ----------
+    const LS_KEY = "simpleCountdownTimer.v1";
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const s = JSON.parse(raw);
+
+        if (typeof s.theme === "string") setTheme(s.theme);
+        if (Number.isFinite(s.h)) hoursSel.value = String(s.h);
+        if (Number.isFinite(s.m)) minsSel.value = String(s.m);
+        if (Number.isFinite(s.sec)) secsSel.value = String(s.sec);
+
+        // don't auto-start; just restore selection
+        syncFromSelectors();
+        render(remainingMs);
+      } catch {}
+    }
+    function saveState() {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify({
+          theme: document.documentElement.getAttribute("data-theme") || "light",
+          h: Number(hoursSel.value || 0),
+          m: Number(minsSel.value || 0),
+          sec: Number(secsSel.value || 0),
+        }));
+      } catch {}
+    }
+
+    // ---------- theme ----------
+    function setTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      darkSwitch.setAttribute("aria-checked", theme === "dark" ? "true" : "false");
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute("data-theme") || "light";
+      setTheme(cur === "dark" ? "light" : "dark");
+      saveState();
+    }
+
+    // ---------- fullscreen ----------
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+          fsBtn.textContent = "Exit fullscreen";
+        } else {
+          await document.exitFullscreen();
+          fsBtn.textContent = "Fullscreen";
+        }
+      } catch {
+        // ignore (e.g., blocked by browser)
+      }
+    }
+    document.addEventListener("fullscreenchange", () => {
+      fsBtn.textContent = document.fullscreenElement ? "Exit fullscreen" : "Fullscreen";
+    });
+
+    // ---------- timer logic ----------
+    function syncFromSelectors() {
+      const h = Number(hoursSel.value || 0);
+      const m = Number(minsSel.value || 0);
+      const s = Number(secsSel.value || 0);
+      initialMs = (h * 3600 + m * 60 + s) * 1000;
+      remainingMs = initialMs;
+      updateMessage();
+      updateButtons();
+      saveState();
+    }
+
+    function updateMessage() {
+      if (initialMs <= 0) msgEl.textContent = "Please select a Timer period";
+      else msgEl.textContent = "";
+    }
+
+    function render(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+
+      hhEl.textContent = pad2(h);
+      mmEl.textContent = pad2(m);
+      ssEl.textContent = pad2(s);
+    }
+
+    function beep() {
+      // simple "bell" using WebAudio (no external assets)
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.value = 880;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        o.start();
+
+        const now = ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+        o.stop(now + 0.85);
+
+        setTimeout(() => ctx.close(), 1000);
+      } catch {}
+    }
+
+    function stopLoop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      updateButtons();
+    }
+
+    function tick(ts) {
+      if (!running) return;
+      if (!lastTick) lastTick = ts;
+      const dt = ts - lastTick;
+      lastTick = ts;
+
+      remainingMs -= dt;
+      if (remainingMs <= 0) {
+        remainingMs = 0;
+        render(remainingMs);
+        stopLoop();
+        beep();
+        return;
+      }
+
+      render(remainingMs);
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (running) return;
+      if (remainingMs <= 0) {
+        // sync first, in case user changed selectors
+        syncFromSelectors();
+      }
+      if (remainingMs <= 0) return;
+
+      running = true;
+      lastTick = 0;
+      updateButtons();
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function pause() {
+      if (!running) return;
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      updateButtons();
+    }
+
+    function reset() {
+      pause();
+      remainingMs = initialMs;
+      render(remainingMs);
+      updateButtons();
+    }
+
+    function updateButtons() {
+      const canStart = remainingMs > 0 && !running;
+      startBtn.disabled = !canStart;
+
+      pauseBtn.disabled = !running;
+      resetBtn.disabled = initialMs <= 0 || (remainingMs === initialMs && !running);
+
+      // Lock selectors while running
+      hoursSel.disabled = running;
+      minsSel.disabled = running;
+      secsSel.disabled = running;
+    }
+
+    // ---------- settings ----------
+    function toggleSettings() {
+      settingsPanel.classList.toggle("open");
+    }
+
+    // ---------- events ----------
+    [hoursSel, minsSel, secsSel].forEach(el => el.addEventListener("change", () => {
+      if (running) return;
+      syncFromSelectors();
+      render(remainingMs);
+    }));
+
+    startBtn.addEventListener("click", start);
+    pauseBtn.addEventListener("click", pause);
+    resetBtn.addEventListener("click", reset);
+    settingsBtn.addEventListener("click", toggleSettings);
+
+    fsBtn.addEventListener("click", toggleFullscreen);
+
+    darkSwitch.addEventListener("click", toggleTheme);
+    darkSwitch.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleTheme();
+      }
+    });
+
+    // keyboard shortcuts similar to timer tools
+    document.addEventListener("keydown", (e) => {
+      if (e.target && ["INPUT","SELECT","TEXTAREA"].includes(e.target.tagName)) return;
+      if (e.key === " "){ e.preventDefault(); running ? pause() : start(); }
+      if (e.key.toLowerCase() === "r"){ reset(); }
+      if (e.key.toLowerCase() === "f"){ toggleFullscreen(); }
+    });
+
+    // ---------- init ----------
+    setTheme("light");
+    syncFromSelectors();
+    render(remainingMs);
+    loadState();
+    updateButtons();
+  </script>
 </body>
 </html>
