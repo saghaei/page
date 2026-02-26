@@ -1,269 +1,238 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Countdown Timer</title>
-
-<style>
-:root{
-  --bg: #ffffff;
-  --fg: #111827;
-  --muted:#6b7280;
-  --panel:#f3f4f6;
-  --btn:#111827;
-  --btnfg:#ffffff;
-  --btn2:#e5e7eb;
-  --btn2fg:#111827;
-  --border:#e5e7eb;
-}
-
-[data-theme="dark"]{
-  --bg:#0b0f1a;
-  --fg:#f9fafb;
-  --muted:#9ca3af;
-  --panel:#111827;
-  --btn:#f9fafb;
-  --btnfg:#0b0f1a;
-  --btn2:#1f2937;
-  --btn2fg:#f9fafb;
-  --border:#1f2937;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  height:100vh;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-  color:var(--fg);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.timer{
-  text-align:center;
-  width:900px;
-}
-
-.display{
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  gap:18px;
-}
-
-.unit{
-  min-width:180px;
-}
-
-.digits{
-  font-size:110px;
-  font-weight:700;
-  line-height:1;
-  font-variant-numeric: tabular-nums;
-}
-
-.label{
-  margin-top:12px;
-  font-size:18px;
-  color:var(--muted);
-}
-
-.colon{
-  font-size:50px;
-  font-weight:600;
-  transform: translateY(-60px);
-  color:var(--muted);
-}
-
-.buttons{
-  margin-top:30px;
-  display:flex;
-  justify-content:center;
-  gap:12px;
-}
-
-button{
-  padding:12px 20px;
-  font-size:16px;
-  border-radius:12px;
-  cursor:pointer;
-  border:none;
-}
-
-.primary{
-  background:var(--btn);
-  color:var(--btnfg);
-}
-
-.secondary{
-  background:var(--btn2);
-  color:var(--btn2fg);
-  border:1px solid var(--border);
-}
-
-.settings{
-  margin-top:25px;
-  padding:20px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:14px;
-  display:none;
-}
-
-.settings.open{
-  display:block;
-}
-
-select{
-  padding:8px;
-  font-size:15px;
-  margin:5px 10px;
-}
-</style>
+  <meta charset="utf-8" />
+  <title>Countdown Timer</title>
+  <style>
+    :root{
+      --bg: #ffffff;
+      --fg: #111827;
+      --muted:#6b7280;
+      --panel:#f3f4f6;
+      --btn:#111827;
+      --btnfg:#ffffff;
+      --btn2:#e5e7eb;
+      --btn2fg:#111827;
+      --border:#e5e7eb;
+    }
+    [data-theme="dark"]{
+      --bg:#0b0f1a;
+      --fg:#f9fafb;
+      --muted:#9ca3af;
+      --panel:#111827;
+      --btn:#f9fafb;
+      --btnfg:#0b0f1a;
+      --btn2:#1f2937;
+      --btn2fg:#f9fafb;
+      --border:#1f2937;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      height:100vh;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
+      color:var(--fg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .timer{
+      text-align:center;
+      width:900px;
+    }
+    .display{
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      gap:18px;
+    }
+    .unit{ min-width:180px; }
+    .digits{
+      font-size:110px;
+      font-weight:700;
+      line-height:1;
+      font-variant-numeric: tabular-nums;
+    }
+    .label{
+      margin-top:12px;
+      font-size:18px;
+      color:var(--muted);
+    }
+    .colon{
+      font-size:50px;
+      font-weight:600;
+      transform: translateY(-60px);
+      color:var(--muted);
+    }
+    .buttons{
+      margin-top:30px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+    }
+    button{
+      padding:12px 20px;
+      font-size:16px;
+      border-radius:12px;
+      cursor:pointer;
+      border:none;
+    }
+    .primary{
+      background:var(--btn);
+      color:var(--btnfg);
+    }
+    .secondary{
+      background:var(--btn2);
+      color:var(--btn2fg);
+      border:1px solid var(--border);
+    }
+    .time-panel{
+      margin-top:25px;
+      padding:20px;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      display:none;
+    }
+    .time-panel.open{ display:block; }
+    select{
+      padding:8px;
+      font-size:15px;
+      margin:5px 10px;
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="timer">
-
-  <div class="display">
-    <div class="unit">
-      <div id="hh" class="digits">00</div>
-      <div class="label">Hours</div>
+  <div class="timer">
+    <div class="display">
+      <div class="unit">
+        <div id="hh" class="digits">00</div>
+        <div class="label">Hours</div>
+      </div>
+      <div class="colon">:</div>
+      <div class="unit">
+        <div id="mm" class="digits">00</div>
+        <div class="label">Minutes</div>
+      </div>
+      <div class="colon">:</div>
+      <div class="unit">
+        <div id="ss" class="digits">00</div>
+        <div class="label">Seconds</div>
+      </div>
     </div>
 
-    <div class="colon">:</div>
-
-    <div class="unit">
-      <div id="mm" class="digits">00</div>
-      <div class="label">Minutes</div>
+    <div class="buttons">
+      <button id="startBtn" class="primary">Start</button>
+      <button id="pauseBtn" class="secondary">Pause</button>
+      <button id="timeBtn" class="secondary">Time</button>
+      <button id="fullscreenBtn" class="secondary">⛶</button>
     </div>
 
-    <div class="colon">:</div>
-
-    <div class="unit">
-      <div id="ss" class="digits">00</div>
-      <div class="label">Seconds</div>
+    <div id="timePanel" class="time-panel">
+      <select id="hoursSel"></select>
+      <select id="minsSel"></select>
+      <select id="secsSel"></select>
     </div>
   </div>
 
-  <div class="buttons">
-    <button id="startBtn" class="primary">Start</button>
-    <button id="pauseBtn" class="secondary">Pause</button>
-    <button id="resetBtn" class="secondary">Reset</button>
-    <button id="settingsBtn" class="secondary">Settings</button>
-  </div>
+  <script>
+    const hhEl = document.getElementById("hh");
+    const mmEl = document.getElementById("mm");
+    const ssEl = document.getElementById("ss");
 
-  <div id="settings" class="settings">
-    <select id="hoursSel"></select>
-    <select id="minsSel"></select>
-    <select id="secsSel"></select>
-  </div>
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const timeBtn = document.getElementById("timeBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
 
-</div>
+    const timePanel = document.getElementById("timePanel");
+    const hoursSel = document.getElementById("hoursSel");
+    const minsSel = document.getElementById("minsSel");
+    const secsSel = document.getElementById("secsSel");
 
-<script>
-const hhEl = document.getElementById("hh");
-const mmEl = document.getElementById("mm");
-const ssEl = document.getElementById("ss");
+    function pad(n){ return String(n).padStart(2,"0"); }
 
-const startBtn = document.getElementById("startBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-const resetBtn = document.getElementById("resetBtn");
-const settingsBtn = document.getElementById("settingsBtn");
-const settings = document.getElementById("settings");
+    for(let i=0;i<=168;i++){
+      hoursSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+    }
+    for(let i=0;i<=59;i++){
+      minsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+      secsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+    }
 
-const hoursSel = document.getElementById("hoursSel");
-const minsSel = document.getElementById("minsSel");
-const secsSel = document.getElementById("secsSel");
+    let initialMs=0;
+    let remainingMs=0;
+    let running=false;
+    let raf=null;
+    let last=0;
 
-function pad(n){ return String(n).padStart(2,"0"); }
+    function updateFromTimeSelect(){
+      const h=+hoursSel.value;
+      const m=+minsSel.value;
+      const s=+secsSel.value;
+      initialMs=(h*3600+m*60+s)*1000;
+      remainingMs=initialMs;
+      render();
+    }
 
-for(let i=0;i<=168;i++){
-  hoursSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
-}
-for(let i=0;i<=59;i++){
-  minsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
-  secsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
-}
+    function render(){
+      let total=Math.max(0,Math.floor(remainingMs/1000));
+      let h=Math.floor(total/3600);
+      let m=Math.floor((total%3600)/60);
+      let s=total%60;
+      hhEl.textContent=pad(h);
+      mmEl.textContent=pad(m);
+      ssEl.textContent=pad(s);
+    }
 
-let initialMs=0;
-let remainingMs=0;
-let running=false;
-let raf=null;
-let last=0;
+    function tick(ts){
+      if(!running) return;
+      if(!last) last=ts;
+      remainingMs -= (ts-last);
+      last=ts;
+      if(remainingMs<=0){
+        remainingMs=0;
+        running=false;
+      }
+      render();
+      if(running) raf=requestAnimationFrame(tick);
+    }
 
-function updateFromSelect(){
-  const h=+hoursSel.value;
-  const m=+minsSel.value;
-  const s=+secsSel.value;
-  initialMs=(h*3600+m*60+s)*1000;
-  remainingMs=initialMs;
-  render();
-}
+    startBtn.onclick=()=>{
+      if(!remainingMs) updateFromTimeSelect();
+      if(remainingMs>0 && !running){
+        running=true;
+        last=0;
+        raf=requestAnimationFrame(tick);
+      }
+    };
 
-function render(){
-  let total=Math.max(0,Math.floor(remainingMs/1000));
-  let h=Math.floor(total/3600);
-  let m=Math.floor((total%3600)/60);
-  let s=total%60;
-  hhEl.textContent=pad(h);
-  mmEl.textContent=pad(m);
-  ssEl.textContent=pad(s);
-}
+    pauseBtn.onclick=()=>{
+      running=false;
+      cancelAnimationFrame(raf);
+    };
 
-function tick(ts){
-  if(!running) return;
-  if(!last) last=ts;
-  remainingMs -= (ts-last);
-  last=ts;
-  if(remainingMs<=0){
-    remainingMs=0;
-    running=false;
-  }
-  render();
-  if(running) raf=requestAnimationFrame(tick);
-}
+    timeBtn.onclick=()=>{
+      timePanel.classList.toggle("open");
+    };
 
-startBtn.onclick=()=>{
-  if(!remainingMs) updateFromSelect();
-  if(remainingMs>0 && !running){
-    running=true;
-    last=0;
-    raf=requestAnimationFrame(tick);
-  }
-};
+    fullscreenBtn.onclick = async () => {
+      if(!document.fullscreenElement){
+        await document.documentElement.requestFullscreen();
+      }else{
+        await document.exitFullscreen();
+      }
+    };
 
-pauseBtn.onclick=()=>{
-  running=false;
-  cancelAnimationFrame(raf);
-};
+    [hoursSel,minsSel,secsSel].forEach(el=>{
+      el.onchange=()=>{
+        if(!running) updateFromTimeSelect();
+      };
+    });
 
-resetBtn.onclick=()=>{
-  if(confirm("Are you sure you want to reset the timer?")){
-    running=false;
-    cancelAnimationFrame(raf);
-    remainingMs=initialMs;
+    updateFromTimeSelect();
     render();
-  }
-};
-
-settingsBtn.onclick=()=>{
-  settings.classList.toggle("open");
-};
-
-[hoursSel,minsSel,secsSel].forEach(el=>{
-  el.onchange=()=>{
-    if(!running) updateFromSelect();
-  };
-});
-
-updateFromSelect();
-render();
-</script>
-
+  </script>
 </body>
-  </html>
+</html>
