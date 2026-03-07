@@ -1,121 +1,226 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Countdown Timer</title>
-  <style>
-    :root{
-      --bg: #ffffff;
-      --fg: #111827;
-      --muted:#6b7280;
-      --panel:#f3f4f6;
-      --btn:#111827;
-      --btnfg:#ffffff;
-      --btn2:#e5e7eb;
-      --btn2fg:#111827;
-      --border:#e5e7eb;
-    }
-    [data-theme="dark"]{
-      --bg:#0b0f1a;
-      --fg:#f9fafb;
-      --muted:#9ca3af;
-      --panel:#111827;
-      --btn:#f9fafb;
-      --btnfg:#0b0f1a;
-      --btn2:#1f2937;
-      --btn2fg:#f9fafb;
-      --border:#1f2937;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      height:100vh;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:var(--bg);
-      color:var(--fg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .timer{
-      text-align:center;
-      width:900px;
-    }
-    .display{
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      gap:18px;
-    }
-    .unit{ min-width:180px; }
-    .digits{
-      font-size:110px;
-      font-weight:700;
-      line-height:1;
-      font-variant-numeric: tabular-nums;
-    }
-    .label{
-      margin-top:12px;
-      font-size:18px;
-      color:var(--muted);
-    }
-    .colon{
-      font-size:50px;
-      font-weight:600;
-      transform: translateY(-60px);
-      color:var(--muted);
-    }
-    .buttons{
-      margin-top:30px;
-      display:flex;
-      justify-content:center;
-      gap:12px;
-    }
-    button{
-      padding:12px 20px;
-      font-size:16px;
-      border-radius:12px;
-      cursor:pointer;
-      border:none;
-    }
-    .primary{
-      background:var(--btn);
-      color:var(--btnfg);
-    }
-    .secondary{
-      background:var(--btn2);
-      color:var(--btn2fg);
-      border:1px solid var(--border);
-    }
-    .time-panel{
-      margin-top:25px;
-      padding:20px;
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:14px;
-      display:none;
-    }
-    .time-panel.open{ display:block; }
-    select{
-      padding:8px;
-      font-size:15px;
-      margin:5px 10px;
-    }
-  </style>
+<meta charset="utf-8" />
+<title>Countdown Timer</title>
+
+<style>
+:root{
+  --bg:#ffffff;
+  --fg:#111827;
+  --muted:#6b7280;
+  --panel:#f3f4f6;
+  --btn:#111827;
+  --btnfg:#ffffff;
+  --btn2:#e5e7eb;
+  --btn2fg:#111827;
+  --border:#e5e7eb;
+}
+
+[data-theme="dark"]{
+  --bg:#0b0f1a;
+  --fg:#f9fafb;
+  --muted:#9ca3af;
+  --panel:#111827;
+  --btn:#f9fafb;
+  --btnfg:#0b0f1a;
+  --btn2:#1f2937;
+  --btn2fg:#f9fafb;
+  --border:#1f2937;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:var(--fg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.app{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:70px;
+  width:1600px;
+  max-width:95vw;
+}
+
+.text-side{
+  width:520px;
+  display:none;
+  align-self:stretch;
+}
+
+.text-side.open{
+  display:flex;
+}
+
+.textbox-wrapper{
+  position:relative;
+  width:100%;
+  display:flex;
+}
+
+.text-box{
+  width:100%;
+  min-height:100%;
+  height:100%;
+  padding:18px;
+  padding-bottom:54px;
+  font-size:32px;
+  line-height:1.4;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--fg);
+  resize:none;
+  overflow:hidden;
+  outline:none;
+}
+
+.font-controls{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  display:flex;
+  gap:6px;
+}
+
+.font-controls button{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#ffffff;
+  color:#111827;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  line-height:1;
+  padding:0;
+}
+
+.timer{
+  text-align:center;
+  flex:0 0 auto;
+  width:fit-content;
+}
+
+.display{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:18px;
+}
+
+.unit{
+  min-width:180px;
+}
+
+.digits{
+  font-size:110px;
+  font-weight:700;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+
+.label{
+  margin-top:12px;
+  font-size:18px;
+  color:var(--muted);
+}
+
+.colon{
+  font-size:50px;
+  font-weight:600;
+  transform:translateY(-60px);
+  color:var(--muted);
+}
+
+.buttons{
+  margin-top:30px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+button{
+  padding:12px 20px;
+  font-size:16px;
+  border-radius:12px;
+  cursor:pointer;
+  border:none;
+}
+
+.primary{
+  background:var(--btn);
+  color:var(--btnfg);
+}
+
+.secondary{
+  background:var(--btn2);
+  color:var(--btn2fg);
+  border:1px solid var(--border);
+}
+
+.time-panel{
+  margin-top:25px;
+  padding:20px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  display:none;
+}
+
+.time-panel.open{
+  display:block;
+}
+
+select{
+  padding:8px;
+  font-size:15px;
+  margin:5px 10px;
+}
+</style>
 </head>
+
 <body>
-  <div class="timer">
+<div class="app">
+
+  <div id="textSide" class="text-side">
+    <div class="textbox-wrapper">
+      <textarea id="textBox" class="text-box" placeholder="Enter text here..."></textarea>
+
+      <div class="font-controls">
+        <button id="decreaseFontBtn" type="button">−</button>
+        <button id="increaseFontBtn" type="button">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer" id="timer">
     <div class="display">
       <div class="unit">
         <div id="hh" class="digits">00</div>
         <div class="label">Hours</div>
       </div>
+
       <div class="colon">:</div>
+
       <div class="unit">
         <div id="mm" class="digits">00</div>
         <div class="label">Minutes</div>
       </div>
+
       <div class="colon">:</div>
+
       <div class="unit">
         <div id="ss" class="digits">00</div>
         <div class="label">Seconds</div>
@@ -126,6 +231,7 @@
       <button id="startBtn" class="primary">Start</button>
       <button id="pauseBtn" class="secondary">Pause</button>
       <button id="timeBtn" class="secondary">Time</button>
+      <button id="noteBtn" class="secondary">Note</button>
       <button id="fullscreenBtn" class="secondary">⛶</button>
     </div>
 
@@ -136,103 +242,221 @@
     </div>
   </div>
 
-  <script>
-    const hhEl = document.getElementById("hh");
-    const mmEl = document.getElementById("mm");
-    const ssEl = document.getElementById("ss");
+</div>
 
-    const startBtn = document.getElementById("startBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const timeBtn = document.getElementById("timeBtn");
-    const fullscreenBtn = document.getElementById("fullscreenBtn");
+<script>
+const hhEl = document.getElementById("hh");
+const mmEl = document.getElementById("mm");
+const ssEl = document.getElementById("ss");
 
-    const timePanel = document.getElementById("timePanel");
-    const hoursSel = document.getElementById("hoursSel");
-    const minsSel = document.getElementById("minsSel");
-    const secsSel = document.getElementById("secsSel");
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const timeBtn = document.getElementById("timeBtn");
+const noteBtn = document.getElementById("noteBtn");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
 
-    function pad(n){ return String(n).padStart(2,"0"); }
+const timePanel = document.getElementById("timePanel");
+const hoursSel = document.getElementById("hoursSel");
+const minsSel = document.getElementById("minsSel");
+const secsSel = document.getElementById("secsSel");
 
-    for(let i=0;i<=168;i++){
-      hoursSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+const textSide = document.getElementById("textSide");
+const textBox = document.getElementById("textBox");
+const timer = document.getElementById("timer");
+const increaseFontBtn = document.getElementById("increaseFontBtn");
+const decreaseFontBtn = document.getElementById("decreaseFontBtn");
+
+function pad(n){
+  return String(n).padStart(2, "0");
+}
+
+for(let i = 0; i <= 168; i++){
+  hoursSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+}
+
+for(let i = 0; i <= 59; i++){
+  minsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+  secsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
+}
+
+let initialMs = 0;
+let remainingMs = 0;
+let running = false;
+let raf = null;
+let last = 0;
+
+let fontSize = 32;
+const minFontSize = 12;
+const maxFontSize = 100;
+const fontStep = 2;
+
+function updateFont(){
+  textBox.style.fontSize = fontSize + "px";
+  autoResize();
+}
+
+function updateFromTimeSelect(){
+  const h = +hoursSel.value;
+  const m = +minsSel.value;
+  const s = +secsSel.value;
+
+  initialMs = (h * 3600 + m * 60 + s) * 1000;
+  remainingMs = initialMs;
+
+  render();
+  syncInitialTextboxHeight();
+}
+
+function render(){
+  const total = Math.max(0, Math.floor(remainingMs / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+
+  hhEl.textContent = pad(h);
+  mmEl.textContent = pad(m);
+  ssEl.textContent = pad(s);
+}
+
+function tick(ts){
+  if(!running) return;
+
+  if(!last) last = ts;
+
+  remainingMs -= (ts - last);
+  last = ts;
+
+  if(remainingMs <= 0){
+    remainingMs = 0;
+    running = false;
+  }
+
+  render();
+
+  if(running){
+    raf = requestAnimationFrame(tick);
+  }
+}
+
+function syncInitialTextboxHeight(){
+  if(!textSide.classList.contains("open")) return;
+
+  textBox.style.height = "auto";
+  const timerHeight = timer.offsetHeight;
+  textBox.style.height = timerHeight + "px";
+}
+
+function autoResize(){
+  if(!textSide.classList.contains("open")) return;
+
+  textBox.style.height = "auto";
+  const timerHeight = timer.offsetHeight;
+  const neededHeight = Math.max(timerHeight, textBox.scrollHeight);
+  textBox.style.height = neededHeight + "px";
+}
+
+startBtn.onclick = () => {
+  if(!remainingMs) updateFromTimeSelect();
+
+  if(remainingMs > 0 && !running){
+    running = true;
+    last = 0;
+    raf = requestAnimationFrame(tick);
+  }
+};
+
+pauseBtn.onclick = () => {
+  running = false;
+  cancelAnimationFrame(raf);
+};
+
+timeBtn.onclick = () => {
+  timePanel.classList.toggle("open");
+  setTimeout(() => {
+    syncInitialTextboxHeight();
+    autoResize();
+  }, 0);
+};
+
+noteBtn.onclick = () => {
+  const isOpen = textSide.classList.toggle("open");
+  noteBtn.textContent = isOpen ? "Note" : "Note";
+
+  if(isOpen){
+    if(textBox.value.trim() === ""){
+      textBox.value = "• ";
+      const end = textBox.value.length;
+      textBox.focus();
+      textBox.setSelectionRange(end, end);
     }
-    for(let i=0;i<=59;i++){
-      minsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
-      secsSel.innerHTML += `<option value="${i}">${pad(i)}</option>`;
-    }
 
-    let initialMs=0;
-    let remainingMs=0;
-    let running=false;
-    let raf=null;
-    let last=0;
+    setTimeout(() => {
+      syncInitialTextboxHeight();
+      autoResize();
+    }, 0);
+  }
+};
 
-    function updateFromTimeSelect(){
-      const h=+hoursSel.value;
-      const m=+minsSel.value;
-      const s=+secsSel.value;
-      initialMs=(h*3600+m*60+s)*1000;
-      remainingMs=initialMs;
-      render();
-    }
+fullscreenBtn.onclick = async () => {
+  if(!document.fullscreenElement){
+    await document.documentElement.requestFullscreen();
+  }else{
+    await document.exitFullscreen();
+  }
 
-    function render(){
-      let total=Math.max(0,Math.floor(remainingMs/1000));
-      let h=Math.floor(total/3600);
-      let m=Math.floor((total%3600)/60);
-      let s=total%60;
-      hhEl.textContent=pad(h);
-      mmEl.textContent=pad(m);
-      ssEl.textContent=pad(s);
-    }
+  setTimeout(() => {
+    syncInitialTextboxHeight();
+    autoResize();
+  }, 100);
+};
 
-    function tick(ts){
-      if(!running) return;
-      if(!last) last=ts;
-      remainingMs -= (ts-last);
-      last=ts;
-      if(remainingMs<=0){
-        remainingMs=0;
-        running=false;
-      }
-      render();
-      if(running) raf=requestAnimationFrame(tick);
-    }
+[hoursSel, minsSel, secsSel].forEach(el => {
+  el.onchange = () => {
+    if(!running) updateFromTimeSelect();
+  };
+});
 
-    startBtn.onclick=()=>{
-      if(!remainingMs) updateFromTimeSelect();
-      if(remainingMs>0 && !running){
-        running=true;
-        last=0;
-        raf=requestAnimationFrame(tick);
-      }
-    };
+increaseFontBtn.onclick = () => {
+  fontSize = Math.min(maxFontSize, fontSize + fontStep);
+  updateFont();
+};
 
-    pauseBtn.onclick=()=>{
-      running=false;
-      cancelAnimationFrame(raf);
-    };
+decreaseFontBtn.onclick = () => {
+  fontSize = Math.max(minFontSize, fontSize - fontStep);
+  updateFont();
+};
 
-    timeBtn.onclick=()=>{
-      timePanel.classList.toggle("open");
-    };
+[increaseFontBtn, decreaseFontBtn].forEach(btn => {
+  btn.addEventListener("click", e => e.stopPropagation());
+});
 
-    fullscreenBtn.onclick = async () => {
-      if(!document.fullscreenElement){
-        await document.documentElement.requestFullscreen();
-      }else{
-        await document.exitFullscreen();
-      }
-    };
+textBox.value = "• ";
 
-    [hoursSel,minsSel,secsSel].forEach(el=>{
-      el.onchange=()=>{
-        if(!running) updateFromTimeSelect();
-      };
-    });
+textBox.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    e.preventDefault();
 
-    updateFromTimeSelect();
-    render();
-  </script>
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    const before = this.value.substring(0, start);
+    const after = this.value.substring(end);
+
+    this.value = before + "\n• " + after;
+    this.selectionStart = this.selectionEnd = start + 3;
+
+    autoResize();
+  }
+});
+
+textBox.addEventListener("input", autoResize);
+window.addEventListener("resize", () => {
+  syncInitialTextboxHeight();
+  autoResize();
+});
+
+updateFont();
+updateFromTimeSelect();
+render();
+</script>
 </body>
 </html>
